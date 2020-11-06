@@ -1,0 +1,47 @@
+---
+
+name: molecule_master
+
+on:
+  push:
+    branches:
+      - master
+      - ci_*
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  molecule:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario:
+          - default
+        distros:
+          - centos8
+          - debian10
+          - fedora32
+          - ubuntu1804
+          - ubuntu2004
+        versions:
+          - stable
+        os_packages:
+          - false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: "${{ github.repository }}"
+      - name: Molecule
+        uses: robertdebock/molecule-action@2.6.3
+        env:
+          MOLECULE_DISTRO: "${{ matrix.distros }}"
+          TEST_VERSION: "${{ matrix.versions }}"
+          OS_PACKAGES: "${{ matrix.os_packages }}"
+        with:
+          options: parallel
+          scenario: ${{ matrix.scenario }}
