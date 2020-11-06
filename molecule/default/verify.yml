@@ -6,21 +6,31 @@
 
   tasks:
 
+    - name: "rclone - which"
+      command: "which rclone"  # noqa 301
+      register: shell_result_one
+
+    - debug:
+        var: shell_result_one
+
     - name: "rclone - retrieve information"
       stat:
-        path: "/usr/local/bin/rclone"
+        path: "{{ shell_result_one.stdout }}"
       register: remote_file
+
+    - debug: var=remote_file.stat
+
     - name: "rclone - assert that file is created correctly"
       assert:
         that:
           - "remote_file.stat.exists"
           - "remote_file.stat.isreg"  # is a regular file
-          # - "remote_file.stat.path == '{{ test_rclone_file_path }}'"
+          #  - "remote_file.stat.path == '{{ rclone_binary_path }}'"
           - "remote_file.stat.mode == '0755'"
 
     - name: "rclone - check version"
-      command: "/usr/local/bin/rclone version"  # noqa 301
-      register: shell_result
+      command: "rclone version"  # noqa 301
+      register: shell_result_two
 
     - debug:
-        var: shell_result.stdout_lines
+        var: shell_result_two.stdout_lines

@@ -10,6 +10,13 @@ rclone_setup_tmp_dir: "/tmp/rclone_setup"
 # The location to install the config file if configured
 rclone_config_location: "/root/.config/rclone/rclone.conf"
 
+# where to install rclone to
+rclone_binary_path: "/usr/local/bin/rclone"
+
+# If true, install rclone from the package repository of the distribution.
+# If false, install rclone from the rclone-project-repository.
+os_packages: false
+
 PACKAGES:
   - unzip
 
