@@ -6,19 +6,29 @@
 
   tasks:
 
-    - name: "rclone - which"
-      command: "which rclone"  # noqa 301
-      register: shell_result_one
+    - debug: var=ansible_distribution
+    - debug: var=ansible_distribution_major_version
+    - debug: var=ansible_os_family
 
-    - debug:
-        var: shell_result_one
+    - name: Gather main variables
+      include_vars: '../../defaults/main.yml'
+
+    - name: Gather OS specific variables
+      include_vars: "{{ item }}"
+      with_first_found:
+        - '../../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        - '../../vars/{{ ansible_distribution }}.yml'
+        - '../../vars/{{ ansible_os_family }}.yml'
+
+    - debug: var=rclone_binary_path
 
     - name: "rclone - retrieve information"
       stat:
-        path: "{{ shell_result_one.stdout }}"
+        path: '{{ rclone_binary_path }}'
       register: remote_file
+      when: not os_packages
 
-    - debug: var=remote_file.stat
+    #- debug: var=remote_file.stat
 
     - name: "rclone - assert that file is created correctly"
       assert:
@@ -29,8 +39,9 @@
           - "remote_file.stat.mode == '0755'"
 
     - name: "rclone - check version"
-      command: "rclone version"  # noqa 301
-      register: shell_result_two
+      command: "{{ rclone_binary_path }} version"  # noqa 301
+      register: shell_result_one
+      when: not os_packages
 
     - debug:
-        var: shell_result_two.stdout_lines
+        var: shell_result_one.stdout_lines
