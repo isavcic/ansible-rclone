@@ -25,18 +25,17 @@ jobs:
           - centos8
           - debian10
           - fedora32
-          - ubuntu1804
           - ubuntu2004
         versions:
           - stable
         os_packages:
           - false
     steps:
-      - name: Checkout
+      - name: checkout
         uses: actions/checkout@v2
         with:
           path: "${{ github.repository }}"
-      - name: Molecule
+      - name: molecule_master
         uses: robertdebock/molecule-action@2.6.3
         env:
           MOLECULE_DISTRO: "${{ matrix.distros }}"
