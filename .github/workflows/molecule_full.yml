@@ -2,7 +2,7 @@
 
 name: molecule_full_matrix
 
-on:
+on:   # yamllint disable-line rule:truthy
   push:
     branches:
       - master

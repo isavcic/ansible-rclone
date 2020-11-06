@@ -1,8 +1,8 @@
 ---
 
-name: molecule_master
+name: molecule_main
 
-on:
+on:   # yamllint disable-line rule:truthy
   push:
     branches:
       - master
@@ -36,7 +36,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: "${{ github.repository }}"
-      - name: molecule_master
+      - name: molecule_main
         uses: robertdebock/molecule-action@2.6.3
         env:
           MOLECULE_DISTRO: "${{ matrix.distros }}"
