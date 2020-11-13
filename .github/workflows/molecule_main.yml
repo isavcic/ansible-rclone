@@ -23,9 +23,13 @@ jobs:
         scenario:
           - default
         distros:
+          - centos7
           - centos8
+          - debian9
           - debian10
+          - fedora31
           - fedora32
+          - ubuntu1804
           - ubuntu2004
         versions:
           - stable
