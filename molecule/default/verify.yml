@@ -21,32 +21,10 @@
         rclone_binary_path: "/bin/rclone"
       when: os_packages and (ansible_distribution == "CentOS") and (ansible_distribution_major_version == "7")
 
-    #- debug: var=rclone_binary_path
-    #- debug: var=ansible_distribution
-    #- debug: var=ansible_distribution_major_version
-    #- debug: var=ansible_os_family
-
-    #- name: Gather main variables
-      #include_vars: '../../defaults/main.yml'
-
-    #- name: Gather OS specific variables
-      #include_vars: "{{ item }}"
-      #with_first_found:
-        #- '../../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        #- '../../vars/{{ ansible_distribution }}.yml'
-        #- '../../vars/{{ ansible_os_family }}.yml'
-
     - name: "rclone - retrieve information"
       stat:
         path: '{{ rclone_binary_path }}'
       register: remote_file
-
-    #- name: "rclone - which path"
-      #command: "which rclone"  # noqa 301
-      #register: shell_result_two
-
-    #- debug:
-        #var: shell_result_two.stdout_lines
 
     - name: "rclone - assert that file is created correctly"
       assert:
