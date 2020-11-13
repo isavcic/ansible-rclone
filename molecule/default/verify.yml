@@ -4,44 +4,61 @@
   gather_facts: true
   become: true
 
+  vars:
+
+    # path for installation from rclone-repos (os_packages=false)
+    rclone_binary_path: "/usr/local/bin/rclone"
+
   tasks:
 
-    - debug: var=ansible_distribution
-    - debug: var=ansible_distribution_major_version
-    - debug: var=ansible_os_family
+    - name: Set fact for distribution installation
+      set_fact:
+        rclone_binary_path: "/usr/bin/rclone"
+      when: os_packages
 
-    - name: Gather main variables
-      include_vars: '../../defaults/main.yml'
+    - name: Set fact for CentOS-7
+      set_fact:
+        rclone_binary_path: "/bin/rclone"
+      when: os_packages and (ansible_distribution == "CentOS") and (ansible_distribution_major_version == "7")
 
-    - name: Gather OS specific variables
-      include_vars: "{{ item }}"
-      with_first_found:
-        - '../../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
-        - '../../vars/{{ ansible_distribution }}.yml'
-        - '../../vars/{{ ansible_os_family }}.yml'
+    #- debug: var=rclone_binary_path
+    #- debug: var=ansible_distribution
+    #- debug: var=ansible_distribution_major_version
+    #- debug: var=ansible_os_family
 
-    - debug: var=rclone_binary_path
+    #- name: Gather main variables
+      #include_vars: '../../defaults/main.yml'
+
+    #- name: Gather OS specific variables
+      #include_vars: "{{ item }}"
+      #with_first_found:
+        #- '../../vars/{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml'
+        #- '../../vars/{{ ansible_distribution }}.yml'
+        #- '../../vars/{{ ansible_os_family }}.yml'
 
     - name: "rclone - retrieve information"
       stat:
         path: '{{ rclone_binary_path }}'
       register: remote_file
-      when: not os_packages
 
-    #- debug: var=remote_file.stat
+    #- name: "rclone - which path"
+      #command: "which rclone"  # noqa 301
+      #register: shell_result_two
+
+    #- debug:
+        #var: shell_result_two.stdout_lines
 
     - name: "rclone - assert that file is created correctly"
       assert:
         that:
           - "remote_file.stat.exists"
           - "remote_file.stat.isreg"  # is a regular file
-          #  - "remote_file.stat.path == '{{ rclone_binary_path }}'"
+          - "remote_file.stat.path == '{{ rclone_binary_path }}'" # always true, but doesn't hurt
           - "remote_file.stat.mode == '0755'"
 
     - name: "rclone - check version"
       command: "{{ rclone_binary_path }} version"  # noqa 301
       register: shell_result_one
-      when: not os_packages
 
     - debug:
         var: shell_result_one.stdout_lines

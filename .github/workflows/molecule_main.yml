@@ -30,7 +30,7 @@ jobs:
         versions:
           - stable
         os_packages:
-          - false
+          - true
     steps:
       - name: checkout
         uses: actions/checkout@v2
